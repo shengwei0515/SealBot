@@ -3,8 +3,11 @@ import sys
 import logging
 import threading
 from dotenv import dotenv_values
-from controllers.twitch_bot_provider import TwitchBot
-from services.seal_coin import SealCoinService
+from src.controllers.twitch_bot import TwitchBot
+from src.services.seal_coin import SealCoinService
+from src.data_access.postgres import DbRepository
+
+sys.path.insert(1, '.')
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -12,14 +15,18 @@ logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler = logging.StreamHandler(sys.stdout)
 handler.setFormatter(formatter)
-handler.setLevel(logging.DEBUG)
+handler.setLevel(logging.INFO)
 
 logger.addHandler(handler)
 
 
 if __name__ == "__main__":
-    seal_coin_service = SealCoinService()
 
+    db_string =  "postgresql://postgres:password@localhost/postgres"
+
+    db_repositoy = DbRepository(db_string)
+
+    seal_coin_service = SealCoinService(db_repositoy)
 
     config = dotenv_values(".env") 
     twitch_bot = TwitchBot(config, seal_coin_service)

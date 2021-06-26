@@ -44,3 +44,21 @@ $ python3 main.py
 * [Let's make a Twitch bot with Python!](https://dev.to/ninjabunny9000/let-s-make-a-twitch-bot-with-python-2nd8)
 * [TwitchIO - github](https://github.com/TwitchIO/TwitchIO)
 * [TwitchIO - doc](https://twitchio.readthedocs.io/en/latest/)
+* [SQLAlchemy](https://www.compose.com/articles/using-postgresql-through-sqlalchemy/)
+
+
+# db migrate
+* new alembic 
+```
+pythom3 -m alembic init myAlembic
+```
+
+* new migrate
+```
+python3 -m alembic revision -m "create seal_coin table"       
+```
+
+* run
+```
+python3 -m alembic  upgrade head
+```

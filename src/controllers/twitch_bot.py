@@ -26,25 +26,35 @@ class TwitchBot(commands.Bot):
     async def event_ready(self):
         'Called once when the bot goes online.'
         print(f"{self.dot_env_config['BOT_NICK']} is online!")
-        # await self._ws.send_privmsg(self.dot_env_config['CHANNEL'], f"/me has landed!")
+        await self._ws.send_privmsg(self.dot_env_config['CHANNEL'], f"全台最大的豹仔銀行上線啦!!")
 
-# a hello reploy event, but i don't want now
+# log all message in chat
     async def event_message(self, message):
         await self.handle_commands(message)
-        logger.debug("user: " + message._author.name, " message: ", message.content)
+        logger.info("user: " + message._author.name + " message: " + message.content)
 
 # this function will be triggered when sombody sat !test, it will reply test passwed!
-    @commands.command(name='test')
-    async def test(self, ctx):
-        await ctx.send('test passed!')
+    # @commands.command(name='test')
+    # async def test(self, ctx):
+    #     await ctx.send('test passed!')
+
+    @commands.command(name='查帳')
+    async def query_coin(self, ctx):
+        print("===============ctx===========", ctx, ctx.author.name, " arg:",ctx.args)
+        try:
+            coin = self.seal_coin_service.query_coin(ctx.author.name)
+            await ctx.send(f'@{ctx.author.name} 你現在有 {coin} 豹仔幣')
+        except:
+            await ctx.send(f'@{ctx.author.name} 目前豹仔銀行查不到你的存款喔 QQ')
+
 
     async def event_join(self, user):
         self.seal_coin_service.add_audience(user.name)
-        logger.debug("user join: " + user.name)
+        logger.info("user join: " + user.name)
 
     async def event_part(self, user):
         self.seal_coin_service.remove_audience(user.name)
-        logger.debug("user leave: " + user.name)
+        logger.info("user leave: " + user.name)
 # # this function is a scheduler, which will ask you to eat something when 02:07 AM
 # async def timer_function():
 #     while True:
