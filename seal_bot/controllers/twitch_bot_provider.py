@@ -1,14 +1,18 @@
 import os
 import time
+import logging
 import datetime
 import threading
 import asyncio
 from twitchio.ext import commands
 
+logger = logging.getLogger(__name__)
+
 class TwitchBot(commands.Bot):
 
-    def __init__(self, dot_env_config: dict):
+    def __init__(self, dot_env_config: dict, seal_coin_service):
         self.dot_env_config = dot_env_config
+        self.seal_coin_service = seal_coin_service
         super().__init__(
             irc_token=dot_env_config['TMI_TOKEN'],
             client_id=dot_env_config['CLIENT_ID'],
@@ -27,7 +31,7 @@ class TwitchBot(commands.Bot):
 # a hello reploy event, but i don't want now
     async def event_message(self, message):
         await self.handle_commands(message)
-        print(message._author.name, " ", message.content)
+        logger.debug("user: " + message._author.name, " message: ", message.content)
 
 # this function will be triggered when sombody sat !test, it will reply test passwed!
     @commands.command(name='test')
@@ -35,10 +39,12 @@ class TwitchBot(commands.Bot):
         await ctx.send('test passed!')
 
     async def event_join(self, user):
-        print("join: " + user.name)
+        self.seal_coin_service.add_audience(user.name)
+        logger.debug("user join: " + user.name)
 
     async def event_part(self, user):
-        print("leave: " + user.name)
+        self.seal_coin_service.remove_audience(user.name)
+        logger.debug("user leave: " + user.name)
 # # this function is a scheduler, which will ask you to eat something when 02:07 AM
 # async def timer_function():
 #     while True:
