@@ -38,7 +38,7 @@ class TwitchBot(commands.Bot):
     # async def test(self, ctx):
     #     await ctx.send('test passed!')
 
-    @commands.command(name='查帳')
+    @commands.command(name='查帳', aliases=['p', 'P'])
     async def query_coin(self, ctx):
         logger.info("Get query coin command: " + ctx.author.name + " arg: " + str(ctx.args))
         try:
@@ -47,21 +47,21 @@ class TwitchBot(commands.Bot):
         except:
             await ctx.send(f'@{ctx.author.name} 目前豹仔銀行查不到你的存款喔 QQ')
 
-    @commands.command(name='賭')
+    @commands.command(name='賭', aliases=['r', 'R'])
     async def gamble(self, ctx, gamble_arg):
         # logger.info("Get gamble command: " + ctx.author.name + " arg: " + str(ctx.args))
         print("Get gamble command: ", ctx.author.name, " arg: ", gamble_arg)
         gamble_result_message = self.seal_coin_service.gamble(ctx.author.name, gamble_arg)
         await ctx.send(gamble_result_message)        
 
-    @commands.command(name="給錢")
+    @commands.command(name="給錢",  aliases=['give'])
     async def give_coin(self, ctx, receiver, num_of_coin):
         logger.info("Get give coin command: " + ctx.author.name + " arg: " + str(ctx.args))
         give_result = self.seal_coin_service.give_coin(ctx.author.name, receiver, num_of_coin, False)
         await ctx.send(give_result)
 
     # only mod can use this command
-    @commands.command(name="發錢")
+    @commands.command(name="發錢", aliases=['mod_give'])
     async def give_coin_by_mod(self, ctx, receiver, num_of_coin):
         logger.info("Get give coin command" + ctx.author.name + " arg: " + str(ctx.args))
         if not ctx.author.is_mod:

@@ -132,4 +132,4 @@ class SealCoinService:
         reveiver_info.coin += num_of_coin
         self.db_repositoy.update(reveiver_info)
 
-        return f"{sender} 已經成功給了 {reveiver} {num_of_coin} 豹仔幣"
+        return f"{sender} 已經成功給了 @{reveiver} {num_of_coin} 豹仔幣"
