@@ -1,2 +1,4 @@
 twitchio
 python-dotenv
+sqlalchemy
+alembic
