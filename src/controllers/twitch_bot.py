@@ -26,7 +26,7 @@ class TwitchBot(commands.Bot):
     async def event_ready(self):
         'Called once when the bot goes online.'
         print(f"{self.dot_env_config['BOT_NICK']} is online!")
-        await self._ws.send_privmsg(self.dot_env_config['CHANNEL'], f"全台最大的豹仔銀行上線啦!!")
+        await self._ws.send_privmsg(self.dot_env_config['CHANNEL'], f"全台最火豹的上線賭場上線啦!!女裝科科在線發牌，陪您一起嗨翻天～請大家排隊進場 SeemsGood")
 
 # log all message in chat
     async def event_message(self, message):
@@ -40,13 +40,34 @@ class TwitchBot(commands.Bot):
 
     @commands.command(name='查帳')
     async def query_coin(self, ctx):
-        print("===============ctx===========", ctx, ctx.author.name, " arg:",ctx.args)
+        logger.info("Get query coin command: " + ctx.author.name + " arg: " + str(ctx.args))
         try:
             coin = self.seal_coin_service.query_coin(ctx.author.name)
             await ctx.send(f'@{ctx.author.name} 你現在有 {coin} 豹仔幣')
         except:
             await ctx.send(f'@{ctx.author.name} 目前豹仔銀行查不到你的存款喔 QQ')
 
+    @commands.command(name='賭')
+    async def gamble(self, ctx, gamble_arg):
+        # logger.info("Get gamble command: " + ctx.author.name + " arg: " + str(ctx.args))
+        print("Get gamble command: ", ctx.author.name, " arg: ", gamble_arg)
+        gamble_result_message = self.seal_coin_service.gamble(ctx.author.name, gamble_arg)
+        await ctx.send(gamble_result_message)        
+
+    @commands.command(name="給錢")
+    async def give_coin(self, ctx, receiver, num_of_coin):
+        logger.info("Get give coin command: " + ctx.author.name + " arg: " + str(ctx.args))
+        give_result = self.seal_coin_service.give_coin(ctx.author.name, receiver, num_of_coin, False)
+        await ctx.send(give_result)
+
+    # only mod can use this command
+    @commands.command(name="發錢")
+    async def give_coin_by_mod(self, ctx, receiver, num_of_coin):
+        logger.info("Get give coin command" + ctx.author.name + " arg: " + str(ctx.args))
+        if not ctx.author.is_mod:
+            await ctx.send(f"{ctx.author.name} 不是 mod 不能使用這個指令喔 WutFace")
+        give_result = self.seal_coin_service.give_coin(ctx.author.name, receiver, num_of_coin, True)
+        await ctx.send(give_result)
 
     async def event_join(self, user):
         self.seal_coin_service.add_audience(user.name)
