@@ -124,6 +124,8 @@ class SealCoinService:
                 sender_info = self.db_repositoy.get_only_with_fiter(DaoSealCoin, DaoSealCoin.audience == sender)
             except:
                 return f"@{sender} 目前還沒有豹仔幣帳號，請晚點再試試看 VoHiYo"
+            if num_of_coin < 0:
+                return f"@{sender} 還想偷錢啊 StinkyGlitch"
             if sender_info.coin < num_of_coin:
                 return f"@{sender} 只有 {sender_info.coin} 豹仔幣，不夠給錢喔 LUL"
             sender_info.coin -= num_of_coin

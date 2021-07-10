@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class TwitchBot(commands.Bot):
 
-    def __init__(self, dot_env_config: dict, seal_coin_service):
+    def __init__(self, dot_env_config: dict, cold_down_service, seal_coin_service):
         self.dot_env_config = dot_env_config
         self.seal_coin_service = seal_coin_service
         super().__init__(
@@ -20,6 +20,11 @@ class TwitchBot(commands.Bot):
             prefix=dot_env_config['BOT_PREFIX'],
             initial_channels=[dot_env_config['CHANNEL']]
         )
+        self.cold_down_time_in_second = float(dot_env_config['COMMAND_COLD_DOWN'])
+        self.cold_down_service = cold_down_service
+        self.cold_down_service.set_new_cold_down("query_coin")
+        self.cold_down_service.set_new_cold_down("gamble")
+        self.cold_down_service.set_new_cold_down("give_coin")
 
 # this function will be triggered when your bot join the char room
 # it will send a "/me has landed" message
@@ -40,25 +45,46 @@ class TwitchBot(commands.Bot):
 
     @commands.command(name='查帳', aliases=['p', 'P'])
     async def query_coin(self, ctx):
+        # check if lock command
+        if self.cold_down_service.is_cold_down("query_coin"): 
+            return
+
+        # command function
         logger.info("Get query coin command: " + ctx.author.name + " arg: " + str(ctx.args))
         try:
             coin = self.seal_coin_service.query_coin(ctx.author.name)
             await ctx.send(f'@{ctx.author.name} 你現在有 {coin} 豹仔幣')
         except:
             await ctx.send(f'@{ctx.author.name} 目前豹仔銀行查不到你的存款喔 QQ')
-
+        # lock command
+        await self.cold_down_service.lock_with_time("query_coin", self.cold_down_time_in_second)
+        
     @commands.command(name='賭', aliases=['r', 'R'])
     async def gamble(self, ctx, gamble_arg):
-        # logger.info("Get gamble command: " + ctx.author.name + " arg: " + str(ctx.args))
+        # check if lock command
+        if self.cold_down_service.is_cold_down("gamble"): 
+            return
+
+        # command function
         print("Get gamble command: ", ctx.author.name, " arg: ", gamble_arg)
         gamble_result_message = self.seal_coin_service.gamble(ctx.author.name, gamble_arg)
         await ctx.send(gamble_result_message)        
 
+        # lock command
+        await self.cold_down_service.lock_with_time("gamble", self.cold_down_time_in_second)
+
     @commands.command(name="給錢",  aliases=['give'])
     async def give_coin(self, ctx, receiver, num_of_coin):
+        # check if lock command
+        if self.cold_down_service.is_cold_down("give_coin"): 
+            return
+
         logger.info("Get give coin command: " + ctx.author.name + " arg: " + str(ctx.args))
         give_result = self.seal_coin_service.give_coin(ctx.author.name, receiver, num_of_coin, False)
         await ctx.send(give_result)
+
+        # lock command
+        await self.cold_down_service.lock_with_time("give_coin", self.cold_down_time_in_second)
 
     # only mod can use this command
     @commands.command(name="發錢", aliases=['mod_give'])
