@@ -1,15 +1,14 @@
-name: Notion Board
 on:
   issues:
-  issue_comment:
+    types: [opened, edited, labeled, unlabeled, assigned, unassigned, milestoned, demilestoned, reopened, closed]
+
 jobs:
-  notion:
+  notion_job:
     runs-on: ubuntu-latest
+    name: Add GitHub Issues to Notion
     steps:
-      - uses: actions/checkout@v2
-      - name: Notion Board
-        uses: Souvikns/Notion-Board@v1.0.0
-        env: 
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          NOTION_API_KEY: ${{ secrets.NOTION_API_TOKEN }}
-          NOTION_DATABASE: ${{ secrets.NOTION_DB }}
+      - name: Add GitHub Issues to Notion
+        uses: instantish/notion-github-action@v1.1.0
+        with:
+          notion-token: ${{ secrets.NOTION_API_TOKEN }}
+          notion-db: ${{ secrets.NOTION_DB }}
