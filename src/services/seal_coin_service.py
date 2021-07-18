@@ -66,7 +66,7 @@ class SealCoinService:
             audience_info = self.db_repositoy.get_only_with_fiter(DaoSealCoin, DaoSealCoin.audience == audience)
         except:
             return f"@{audience} 目前還沒有豹仔幣帳號，請晚點再試試看 VoHiYo"
-        if number > audience_info.coin:
+        if number > audience_info.coin or audience_info.coin < 0:
             return f"@{audience} 只有 {audience_info.coin} 豹仔幣，不夠你賭喔 LUL"
         if self._if_win_gamble():
             audience_info.coin += number
