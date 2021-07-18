@@ -25,6 +25,7 @@ class TwitchBot(commands.Bot):
         self.cold_down_service.set_new_cold_down("query_coin")
         self.cold_down_service.set_new_cold_down("gamble")
         self.cold_down_service.set_new_cold_down("give_coin")
+        self.cold_down_service.set_new_cold_down("five_fix")
 
 # this function will be triggered when your bot join the char room
 # it will send a "/me has landed" message
@@ -58,7 +59,18 @@ class TwitchBot(commands.Bot):
             await ctx.send(f'@{ctx.author.name} 目前豹仔銀行查不到你的存款喔 QQ')
         # lock command
         await self.cold_down_service.lock_with_time("query_coin", self.cold_down_time_in_second)
-        
+
+    @commands.command(name='伍陸', aliases=['56'])
+    async def five_fix(self, ctx):
+        # check if lock command
+        if self.cold_down_service.is_cold_down("five_fix"): 
+            return
+
+        # command function
+        await ctx.send(f'真的被你氣死')
+        # lock command
+        await self.cold_down_service.lock_with_time("five_fix", self.cold_down_time_in_second)
+
     @commands.command(name='賭', aliases=['r', 'R'])
     async def gamble(self, ctx, gamble_arg):
         # check if lock command
