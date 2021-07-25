@@ -4,7 +4,8 @@ import logging
 import threading
 from dotenv import dotenv_values
 from src.controllers.twitch_bot import TwitchBot
-from src.services.seal_coin import SealCoinService
+from src.services.seal_coin_service import SealCoinService
+from src.services.cold_down_service import ColdDownService
 from src.data_access.postgres import DbRepository
 
 sys.path.insert(1, '.')
@@ -18,18 +19,17 @@ handler.setFormatter(formatter)
 handler.setLevel(logging.INFO)
 
 logger.addHandler(handler)
-
-
 if __name__ == "__main__":
 
-    db_string =  "postgresql://postgres:password@localhost/postgres"
+    db_string =  "postgresql://postgres:password@localhost:15432/postgres"
 
     db_repositoy = DbRepository(db_string)
 
+    cold_down_service = ColdDownService()
     seal_coin_service = SealCoinService(db_repositoy)
 
     config = dotenv_values(".env") 
-    twitch_bot = TwitchBot(config, seal_coin_service)
+    twitch_bot = TwitchBot(config, cold_down_service, seal_coin_service)
 
     thread_coin_service = threading.Thread(target=seal_coin_service.start_share_coin, args=()) 
     thread_coin_service.start()
