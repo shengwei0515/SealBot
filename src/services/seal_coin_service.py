@@ -68,6 +68,13 @@ class SealCoinService:
             return f"@{audience} 目前還沒有豹仔幣帳號，請晚點再試試看 VoHiYo"
         if number > audience_info.coin or audience_info.coin < 0:
             return f"@{audience} 只有 {audience_info.coin} 豹仔幣，不夠你賭喔 LUL"
+
+        negative_rate = 3
+        if number < 0:
+            negative_gamble_number_limint = -1 * negative_rate * audience_info.coin
+            if number < negative_gamble_number_limint:
+                return f"@{audience} 只有 {audience_info.coin} 豹仔幣，不能做空超過 {negative_rate} 倍的豹仔幣唷 StinkyGlitch"
+
         if self._if_win_gamble():
             audience_info.coin += number
             self.db_repositoy.update(audience_info)
